@@ -35,6 +35,24 @@ class Position {
     }
 }
 
+class Base {
+    position;
+    troops = 0;
+    constructor(position, troops) {
+        this.position = position;
+        this.troops = troops;
+    }
+    toObj(){
+        return {
+            position:this.position.toObj(),
+            troops:this.troops
+        }
+    }
+    static fromObj(obj){
+        return new Base(Position.fromObj(obj.position), obj.troops);
+    }
+}
+
 class Path {
     start = new Position(0, 0);
     end = new Position(0, 0);
@@ -82,7 +100,7 @@ class Path {
         return { start: this.start.toObj(), end: this.end.toObj(), time: this.endTime }
     }
     static fromObj(obj) {
-        return new Path(Positin.fromObj(obj.start), Position.fromObj(obj.end), obj.time)
+        return new Path(Position.fromObj(obj.start), Position.fromObj(obj.end), obj.time)
     }
 }
 
@@ -99,8 +117,8 @@ class Map {
         this.MAP_WIDTH = w;
         this.MAP_HEIGHT = h;
     }
-    addBase(position) {
-        this.bases.push(position)
+    addBase(base) {
+        this.bases.push(base)
     }
     addPath(path) {
         this.paths.push(path)
@@ -124,13 +142,18 @@ class Map {
     }
     static fromObj(obj) {
         let temp = new Map(obj.w, obj.h);
+        temp.loadFromObj(obj);
+    }
+    loadFromObj(obj){
+        this.MAP_HEIGHT = obj.h
+        this.MAP_WIDTH = obj.w
         obj.bases.forEach(base => {
-            temp.addBase(Position.fromObj(base))
+            this.addBase(Base.fromObj(base))
         })
         obj.paths.forEach(path => {
-            temp.addPath(Path.fromObj(path))
+            this.addPath(Path.fromObj(path))
         })
-        // TODO: Add inflation for subs and other future stuff...
+
     }
 }
 
@@ -151,7 +174,11 @@ function testPathWithDesmos() {
 }
 
 
+try {
 
-exports.Map = Map;
-exports.Path = Path;
-exports.Position = Position;
+    exports.Map = Map;
+    exports.Path = Path;
+    exports.Position = Position;
+    exports.Base = Base;
+
+} catch (e) { }

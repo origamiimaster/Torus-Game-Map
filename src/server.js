@@ -4,8 +4,18 @@ const app = express();
 const port = 8000;
 
 let Game = new game.Map(500, 500)
-Game.addPath(new game.Path(new game.Position(0, 0), new game.Position(50, 50), 10))
+for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 10; j++) {
+        let base = new game.Base(new game.Position(i * 50, j * 50), Math.floor(Math.random() * 10))
+        Game.addBase(base)
+    }
+}
 
+Game.addPath(new game.Path(new game.Position(0, 0), new game.Position(50, 50), 10))
+Game.addPath(new game.Path(new game.Position(450, 200), new game.Position(50, 400), 10))
+
+
+console.log(Game.toObj())
 
 app.use('/', express.static("src/static"))
 
@@ -14,18 +24,6 @@ app.get('/api', (req, res) => {
 })
 
 app.get('/game', (req, res) => {
-    bases = []
-    for (let i = 0; i < 10; i++) {
-        for (let j = 0; j < 10; j++) {
-            bases.push({ x: i * 50, y: j * 50, count: Math.round(Math.random() * 10) })
-        }
-    }
-    paths = []
-    
-    subs = []
-
-
-    // res.send(JSON.stringify({"bases":bases, "paths": Game.paths}))
     res.send(JSON.stringify(Game.toObj()))
 })
 

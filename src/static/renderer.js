@@ -3,6 +3,7 @@ canvas.height = 500;
 canvas.width = 500;
 document.body.append(canvas)
 let ctx = canvas.getContext("2d");
+let Game = new Map(500, 500);
 update()
 
 function mod(n, m) {
@@ -14,22 +15,36 @@ function update() {
         .then((response) => {
             response.json()
                 .then((gameInfo) => {
-                    // Here we take all the json game data and render it.
-                    gameInfo.bases.forEach(base => {
-                        drawBase(ctx, base.x, base.y, base.count)
-                    })
-                    gameInfo.paths.forEach(path => {
-                        console.log(path)
-                        for (let i = 1; i < 10 + 1; i++) {
-                            drawLine(path[i-1].x, path[i-1].y, path[i].x, path[i].y)
-                        }
-                    })
+                    // Load the game state into our game object.
+                    Game.loadFromObj(gameInfo)
+                    // Then call the render function
+                    renderGame(Game);
+
+
                 })
                 .catch((e) => { console.log(e) })
         })
         .catch((e) => { console.log(e) })
 }
 
+function renderGame(game) {
+    game.bases.forEach(base => {
+        drawBase(ctx, base.position.x, base.position.y, base.troops)
+    })
+    game.paths.forEach(path => {
+        let start = path.getPosition(0);
+        for (let i = 1; i < path.endTime + 1; i++) {
+            let next = path.getPosition(i)
+            if (Math.abs(start.x - next.x) < game.MAP_WIDTH / 2 && 
+                Math.abs(start.y - next.y) < game.MAP_HEIGHT) {
+                // This if condition will break down at extremely high speeds, 
+                // hopefully that doesn't happen. 
+                drawLine(start.x, start.y, next.x, next.y)
+            }
+            start = next;
+        }
+    })
+}
 
 
 function drawBase(ctx, x, y, count = 0) {
