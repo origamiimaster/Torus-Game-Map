@@ -15,8 +15,6 @@ Game.addPath(new game.Path(new game.Position(0, 0), new game.Position(50, 50), 1
 Game.addPath(new game.Path(new game.Position(450, 200), new game.Position(50, 400), 10))
 
 
-console.log(Game.toObj())
-
 app.use('/', express.static("src/static"))
 
 app.get('/api', (req, res) => {

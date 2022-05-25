@@ -4,6 +4,9 @@ canvas.width = 500;
 document.body.append(canvas)
 let ctx = canvas.getContext("2d");
 let Game = new Map(500, 500);
+
+let hoverables = []
+
 update()
 
 function mod(n, m) {
@@ -19,8 +22,6 @@ function update() {
                     Game.loadFromObj(gameInfo)
                     // Then call the render function
                     renderGame(Game);
-
-
                 })
                 .catch((e) => { console.log(e) })
         })
@@ -35,7 +36,7 @@ function renderGame(game) {
         let start = path.getPosition(0);
         for (let i = 1; i < path.endTime + 1; i++) {
             let next = path.getPosition(i)
-            if (Math.abs(start.x - next.x) < game.MAP_WIDTH / 2 && 
+            if (Math.abs(start.x - next.x) < game.MAP_WIDTH / 2 &&
                 Math.abs(start.y - next.y) < game.MAP_HEIGHT) {
                 // This if condition will break down at extremely high speeds, 
                 // hopefully that doesn't happen. 
@@ -44,11 +45,21 @@ function renderGame(game) {
             start = next;
         }
     })
+    setHoverables(game)
 }
 
+function setHoverables(game) {
+    hoverables = []
+    game.bases.forEach(base=>{
+        hoverables.push(base)
+    })
+}
 
-function drawBase(ctx, x, y, count = 0) {
+function drawBase(ctx, x, y, count = 0, hover = false) {
     ctx.fillStyle = "darkblue";
+    if (hover) {
+        ctx.fillStyle = "darkred"
+    }
     ctx.fillRect(x, y, 10, 10);
     ctx.fillStyle = "white"
     ctx.fillText(count, x + 1, y + 9);
@@ -60,6 +71,29 @@ function drawLine(x1, y1, x2, y2) {
     ctx.lineTo(x2, y2);
     ctx.stroke();
 }
+
+canvas.addEventListener("click", (e) => {
+    // Click event handler
+})
+
+canvas.addEventListener("mousemove", (e) => {
+    // console.log(e)
+    if (e.buttons == 1) {
+        // Mouse down and mousemove, complicated to handle rn...
+    } else {
+        // console.log(e.offsetX, e.offsetY)
+        hoverables.forEach((hoverer)=>{
+            if (hoverer.position.x - e.offsetX <= 0 && hoverer.position.x - e.offsetX >= -10
+                &&
+                hoverer.position.y - e.offsetY <= 0 && hoverer.position.y - e.offsetY >= -10) {
+                drawBase(ctx, hoverer.position.x, hoverer.position.y, hoverer.count, true)
+            } else {
+                drawBase(ctx, hoverer.position.x, hoverer.position.y, hoverer.count, false)
+            }
+        })
+    }
+    
+})
 
 
 
