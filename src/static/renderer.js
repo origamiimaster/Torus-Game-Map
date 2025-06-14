@@ -1,7 +1,4 @@
-let canvas = document.createElement('canvas');
-canvas.height = 500;
-canvas.width = 500;
-document.body.append(canvas)
+let canvas = document.getElementById("canvas")
 let ctx = canvas.getContext("2d");
 let Game = new Map(500, 500);
 
